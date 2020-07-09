@@ -5,13 +5,14 @@ services:
   app:
     build: .
     container_name: app
-    entrypoint: dockerize -template ./.docker/app/.env:.env -wait tcp://db:3306 -timeout 40s /var/www/.docker/entrypoint.sh
+    entrypoint: dockerize -template ./.docker/app/.env:.env -template ./.docker/app/.env.testing:.env.testing -wait tcp://db:3306 -timeout 40s /var/www/.docker/entrypoint.sh
     environment:
-      - DB_HOST=db
-      - DB_DATABASE=laravel
-      - DB_USERNAME=root
-      - DB_PASSWORD=root
-      - REDIS_HOST=redis
+      - _DB_HOST=db
+      - _DB_DATABASE=micro_videos
+      - _TEST_DB_DATABASE=micro_videos_test
+      - _DB_USERNAME=root
+      - _DB_PASSWORD=root
+      - _REDIS_HOST=redis
     volumes:
       - .:/var/www
     networks:
@@ -51,8 +52,8 @@ services:
       - "33006:3306"
     volumes:
       - ./.docker/dbdata:/var/lib/mysql
+      - ./.docker/mysql:/docker-entrypoint-initdb.d
     environment:
-      - MYSQL_DATABASE=laravel
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_USER=root
     networks:
